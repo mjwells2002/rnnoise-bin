@@ -1,0 +1,256 @@
+name: build
+
+on:
+  release:
+    types: 
+      - created
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build-linux-x86-64:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise.so
+          asset_name: librnnoise-linux-x86-64.so
+          asset_content_type: application/octet-stream
+  build-linux-x86:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: apt update
+        run: sudo apt-get update -y
+      - name: install  gcc-i686-linux-gnu
+        run: sudo apt-get install gcc-i686-linux-gnu -y
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --host=i686-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise.so
+          asset_name: librnnoise-linux-x86.so
+          asset_content_type: application/octet-stream
+  build-linux-aarch64:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: apt update
+        run: sudo apt-get update -y
+      - name: install  gcc-aarch64-linux-gnu
+        run: sudo apt-get install gcc-aarch64-linux-gnu -y
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --host=aarch64-linux-gnu
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise.so
+          asset_name: librnnoise-linux-aarch64.so
+          asset_content_type: application/octet-stream
+  build-linux-armel:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: apt update
+        run: sudo apt-get update -y
+      - name: install  gcc-arm-linux-gnueabi
+        run: sudo apt-get install gcc-arm-linux-gnueabi -y
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --host=arm-linux-gnueabi 
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise.so
+          asset_name: librnnoise-linux-armel.so
+          asset_content_type: application/octet-stream
+  build-linux-armhf:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: apt update
+        run: sudo apt-get update -y
+      - name: install  gcc-arm-linux-gnueabihf
+        run: sudo apt-get install gcc-arm-linux-gnueabihf -y
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --host=arm-linux-gnueabihf
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise.so
+          asset_name: librnnoise-linux-armhf.so
+          asset_content_type: application/octet-stream
+  build-windows-x86-64:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: apt update
+        run: sudo apt-get update -y
+      - name: install mingw-w64
+        run: sudo apt-get install mingw-w64 -y
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --host=x86_64-w64-mingw32
+      - name: build
+        run: make 
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise-0.dll
+          asset_name: librnnoise-windows-x86-64.dll
+          asset_content_type: application/octet-stream
+  build-windows-x86:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: apt update
+        run: sudo apt-get update -y
+      - name: install mingw-w64
+        run: sudo apt-get install mingw-w64 -y
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --host=i686-w64-mingw32
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise-0.dll
+          asset_name: librnnoise-windows-x86.dll
+          asset_content_type: application/octet-stream
+  build-macos-x86-64:
+    runs-on: macos-11
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: install automake
+        run: brew install automake
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise.dylib
+          asset_name: librnnoise-macos-x86-64.dylib
+          asset_content_type: application/octet-stream
+  build-macos-aarch64:
+    runs-on: macos-11
+    steps:
+      - name: Clone RNNoise
+        uses: sudosubin/git-clone-action@v1.0.1
+        with:
+          repository: xiph/rnnoise
+          platform: gitlab.xiph.org
+      - name: install automake
+        run: brew install automake
+      - name: autogen
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --host=aarch64-apple-darwin CFLAGS="-arch arm64"
+      - name: build
+        run: make
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .libs/librnnoise.dylib
+          asset_name: librnnoise-macos-aarch64.dylib
+          asset_content_type: application/octet-stream
